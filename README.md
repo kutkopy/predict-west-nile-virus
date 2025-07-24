@@ -58,16 +58,12 @@ The model uses the following features:
 1. Clone the repository
 2. Set up a Python virtual environment and install dependencies:
 
-### Unix/macOS/Linux:
+### All Platforms (Unix/macOS/Linux/Windows):
 ```bash
-# Run the setup script
+# Run the cross-platform setup script
+# On Unix/macOS/Linux: use terminal
+# On Windows: use Git Bash
 ./setup.sh
-```
-
-### Windows:
-```batch
-# Run the setup script
-setup.bat
 ```
 
 ### Manual Setup:
@@ -78,8 +74,8 @@ python3 -m venv venv
 # Activate virtual environment
 # On Unix/macOS/Linux:
 source venv/bin/activate
-# On Windows:
-venv\Scripts\activate.bat
+# On Windows (Git Bash):
+source venv/Scripts/activate
 
 # Install requirements
 pip install -r requirements.txt
@@ -91,8 +87,8 @@ pip install -r requirements.txt
    ```bash
    # Unix/macOS/Linux:
    source venv/bin/activate
-   # Windows:
-   venv\Scripts\activate.bat
+   # Windows (Git Bash):
+   source venv/Scripts/activate
    ```
 
 2. Run the optimized predictor:
@@ -146,8 +142,7 @@ This will:
 ├── wnv_predictor_optimized.py
 ├── predictions_optimized.csv
 ├── requirements.txt
-├── setup.sh                       # Setup script for Unix/macOS/Linux
-├── setup.bat                      # Setup script for Windows
+├── setup.sh                       # Cross-platform setup script (Unix/macOS/Linux/Git Bash)
 └── README.md
 ```
 
