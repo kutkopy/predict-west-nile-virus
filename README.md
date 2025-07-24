@@ -56,17 +56,49 @@ The model uses the following features:
 ## Installation
 
 1. Clone the repository
-2. Install required packages:
+2. Set up a Python virtual environment and install dependencies:
+
+### Unix/macOS/Linux:
 ```bash
+# Run the setup script
+./setup.sh
+```
+
+### Windows:
+```batch
+# Run the setup script
+setup.bat
+```
+
+### Manual Setup:
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+# On Unix/macOS/Linux:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate.bat
+
+# Install requirements
 pip install -r requirements.txt
 ```
 
 ## Usage
 
-Run the optimized predictor:
-```bash
-python wnv_predictor_optimized.py
-```
+1. Activate the virtual environment (if not already active):
+   ```bash
+   # Unix/macOS/Linux:
+   source venv/bin/activate
+   # Windows:
+   venv\Scripts\activate.bat
+   ```
+
+2. Run the optimized predictor:
+   ```bash
+   python wnv_predictor_optimized.py
+   ```
 
 This will:
 1. Load and merge all datasets
@@ -110,9 +142,12 @@ This will:
 │   ├── test.csv
 │   ├── weather.csv
 │   └── spray.csv
+├── venv/                          # Virtual environment (created after setup)
 ├── wnv_predictor_optimized.py
 ├── predictions_optimized.csv
 ├── requirements.txt
+├── setup.sh                       # Setup script for Unix/macOS/Linux
+├── setup.bat                      # Setup script for Windows
 └── README.md
 ```
 
