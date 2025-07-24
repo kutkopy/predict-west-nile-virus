@@ -6,7 +6,7 @@ This script trains an improved WNV prediction model using the preprocessed data
 with advanced feature engineering from data_preprocessor.py.
 
 Key improvements over the original model:
-- Uses 43 engineered features vs basic features
+- Uses 43+ engineered features vs basic features
 - Better handling of class imbalance with SMOTE
 - More comprehensive hyperparameter tuning
 - Advanced evaluation metrics and feature importance analysis
