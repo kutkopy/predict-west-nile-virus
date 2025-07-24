@@ -30,11 +30,11 @@ source $VENV_ACTIVATE
 
 # Upgrade pip
 echo "Upgrading pip..."
-pip install --upgrade pip
+$PYTHON_CMD -m pip install --upgrade pip
 
 # Install requirements
 echo "Installing requirements..."
-pip install -r requirements.txt
+$PYTHON_CMD -m pip install -r requirements.txt
 
 echo "Setup complete! Virtual environment is now active."
 echo "To activate the environment in the future, run: source $VENV_ACTIVATE"
