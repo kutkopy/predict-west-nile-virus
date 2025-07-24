@@ -58,7 +58,7 @@ class WestNileDataPreprocessor:
         return self
     
     def clean_weather_data(self):
-        """Clean and process weather data."""
+        """Clean and process weather data with moving averages and lag features."""
         print("Cleaning weather data...")
         
         # Define numeric columns in weather data
@@ -80,8 +80,40 @@ class WestNileDataPreprocessor:
         # Average weather data across stations by date
         weather_cols = ['Date'] + [col for col in numeric_columns if col in self.weather_df.columns]
         self.weather_processed = self.weather_df[weather_cols].groupby('Date').mean().reset_index()
+        self.weather_processed = self.weather_processed.sort_values('Date').reset_index(drop=True)
         
-        print(f"Weather data processed: {self.weather_processed.shape}")
+        # Add moving averages and lag features to account for mosquito collection timing
+        # Mosquitoes are collected Mon-Fri but tested Thu-Fri, so weather from earlier in week matters
+        key_weather_vars = ['Tmax', 'Tmin', 'Tavg', 'DewPoint', 'PrecipTotal']
+        
+        print("Creating moving averages and lag features for weather data...")
+        for var in key_weather_vars:
+            if var in self.weather_processed.columns:
+                # Moving averages (mosquito development takes 7-14 days)
+                self.weather_processed[f'{var}_3day_avg'] = (
+                    self.weather_processed[var].rolling(window=3, min_periods=1).mean()
+                )
+                self.weather_processed[f'{var}_7day_avg'] = (
+                    self.weather_processed[var].rolling(window=7, min_periods=1).mean()
+                )
+                self.weather_processed[f'{var}_14day_avg'] = (
+                    self.weather_processed[var].rolling(window=14, min_periods=1).mean()
+                )
+                
+                # Lag features (2-5 days prior to account for collection timing)
+                self.weather_processed[f'{var}_lag2'] = self.weather_processed[var].shift(2)
+                self.weather_processed[f'{var}_lag5'] = self.weather_processed[var].shift(5)
+        
+        # Cumulative precipitation features
+        if 'PrecipTotal' in self.weather_processed.columns:
+            self.weather_processed['Precip_7day_sum'] = (
+                self.weather_processed['PrecipTotal'].rolling(window=7, min_periods=1).sum()
+            )
+            self.weather_processed['Precip_14day_sum'] = (
+                self.weather_processed['PrecipTotal'].rolling(window=14, min_periods=1).sum()
+            )
+        
+        print(f"Weather data processed with {self.weather_processed.shape[1]} features: {self.weather_processed.shape}")
         return self
     
     def create_temporal_features(self, df):
@@ -302,9 +334,26 @@ class WestNileDataPreprocessor:
             # Species features
             'IsPipiens', 'IsRestuans', 'IsPipiensRestuans', 'IsHighRiskSpecies',
             
-            # Weather features
+            # Base weather features
             'Tmax', 'Tmin', 'Tavg', 'DewPoint', 'WetBulb', 'PrecipTotal',
             'StnPressure', 'SeaLevel', 'ResultSpeed', 'AvgSpeed',
+            
+            # Moving average weather features (3, 7, 14 day windows)
+            'Tmax_3day_avg', 'Tmax_7day_avg', 'Tmax_14day_avg',
+            'Tmin_3day_avg', 'Tmin_7day_avg', 'Tmin_14day_avg',
+            'Tavg_3day_avg', 'Tavg_7day_avg', 'Tavg_14day_avg',
+            'DewPoint_3day_avg', 'DewPoint_7day_avg', 'DewPoint_14day_avg',
+            'PrecipTotal_3day_avg', 'PrecipTotal_7day_avg', 'PrecipTotal_14day_avg',
+            
+            # Lag weather features (2 and 5 day lags)
+            'Tmax_lag2', 'Tmax_lag5',
+            'Tmin_lag2', 'Tmin_lag5',
+            'Tavg_lag2', 'Tavg_lag5',
+            'DewPoint_lag2', 'DewPoint_lag5',
+            'PrecipTotal_lag2', 'PrecipTotal_lag5',
+            
+            # Cumulative precipitation features
+            'Precip_7day_sum', 'Precip_14day_sum',
             
             # Derived weather features
             'TempRange', 'TempAvg', 'RelativeHumidity', 'HeatStress',
