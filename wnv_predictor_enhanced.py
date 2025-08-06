@@ -141,17 +141,15 @@ class EnhancedWNVPredictor:
         
         # Define parameter grid
         param_grid = {
-            'smote__sampling_strategy': [0.2, 0.3, 0.5],
             'classifier__n_estimators': [100, 200, 300],
-            'classifier__max_depth': [10, 15, 20, None],
+            'classifier__max_depth': [10, 15, 20],
             'classifier__min_samples_split': [2, 5, 10],
             'classifier__min_samples_leaf': [1, 2, 4],
-            'classifier__class_weight': [None, 'balanced']
         }
         
         # Create pipeline
         pipeline = ImbPipeline([
-            ('smote', SMOTE(random_state=42)),
+            ('smote', SMOTE(sampling_strategy=0.3, random_state=42)),
             ('classifier', RandomForestClassifier(random_state=42, n_jobs=-1))
         ])
         
