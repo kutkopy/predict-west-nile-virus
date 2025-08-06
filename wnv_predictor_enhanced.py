@@ -21,8 +21,6 @@ from sklearn.metrics import (classification_report, confusion_matrix,
                            average_precision_score)
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
 import warnings
 warnings.filterwarnings('ignore')
@@ -247,19 +245,6 @@ class EnhancedWNVPredictor:
         print("-" * 40)
         for i, (_, row) in enumerate(feature_importance_df.head(20).iterrows(), 1):
             print(f"{i:2d}. {row['feature']:<25} {row['importance']:.4f}")
-        
-        # Plot feature importance
-        plt.figure(figsize=(12, 8))
-        top_features = feature_importance_df.head(20)
-        
-        plt.barh(range(len(top_features)), top_features['importance'])
-        plt.yticks(range(len(top_features)), top_features['feature'])
-        plt.xlabel('Feature Importance')
-        plt.title('Top 20 Feature Importances')
-        plt.gca().invert_yaxis()
-        plt.tight_layout()
-        plt.savefig('feature_importance.png', dpi=300, bbox_inches='tight')
-        plt.show()
         
         return self
     
