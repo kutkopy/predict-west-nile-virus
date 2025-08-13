@@ -209,3 +209,4 @@ __marimo__/
 # Project specific
 predictions_*.csv
 processed_data/
+model/
