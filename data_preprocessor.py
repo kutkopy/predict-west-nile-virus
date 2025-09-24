@@ -176,28 +176,45 @@ class WestNileDataPreprocessor:
         return df
     
     def encode_species(self, df, fit=True):
-        """
-        TODO: Implement species encoding and indicator column creation.
-        
-        This method should:
-        1. Create indicator columns for different species types
-        2. Handle the 'CULEX PIPIENS/RESTUANS' combined species appropriately
-        3. Create a high-risk species indicator
-        4. Return the modified dataframe
-        
-        Args:
-            df: DataFrame containing 'Species' column
-            fit: Boolean indicating if this is training data (for fitting encoders)
-            
-        Returns:
-            DataFrame with additional species encoding columns
-        """
+        """Encode species and add specific indicator columns."""
         df = df.copy()
-        
-        # TODO: Implement the logic here
-        # Hint: Look at the existing species values in the data
-        # Common species include: 'CULEX PIPIENS', 'CULEX RESTUANS', 'CULEX PIPIENS/RESTUANS'
-        
+
+        # Add indicator columns
+        df['IsPipiens'] = 0.0
+        df['IsRestuans'] = 0.0
+        df['IsPipiensRestuans'] = 0.0
+
+        pipiens_mask = df['Species'] == 'CULEX PIPIENS'
+        restuans_mask = df['Species'] == 'CULEX RESTUANS'
+        pipiensrestuans_mask = df['Species'] == 'CULEX PIPIENS/RESTUANS'
+
+        df.loc[pipiens_mask, 'IsPipiens'] = 1.0
+        df.loc[restuans_mask, 'IsRestuans'] = 1.0
+        df.loc[pipiensrestuans_mask, 'IsPipiens'] = 0.5
+        df.loc[pipiensrestuans_mask, 'IsRestuans'] = 0.5
+        df.loc[pipiensrestuans_mask, 'IsPipiensRestuans'] = 1.0
+
+        # High-risk species indicator
+        high_risk_species = ['CULEX PIPIENS', 'CULEX RESTUANS', 'CULEX PIPIENS/RESTUANS']
+        df['IsHighRiskSpecies'] = df['Species'].isin(high_risk_species).astype(int)
+
+        # If you do not use Species_encoded or label encoding elsewhere, you can remove the label encoder.
+        # If you still need a numeric encoding for modeling or interactions, you may keep it.
+        # Remove the following block if not needed:
+        # if fit:
+        #     self.label_encoders['Species'] = LabelEncoder()
+        #     df['Species_encoded'] = self.label_encoders['Species'].fit_transform(df['Species'])
+        #     self.known_species = set(self.label_encoders['Species'].classes_)
+        #     self.most_common_species = df['Species'].value_counts().index[0]
+        # else:
+        #     unknown_species_mask = ~df['Species'].isin(self.known_species)
+        #     if unknown_species_mask.any():
+        #         print(f"Warning: Found {unknown_species_mask.sum()} samples with unknown species:")
+        #         print(df[unknown_species_mask]['Species'].value_counts().to_dict())
+        #         df.loc[unknown_species_mask, 'Species'] = self.most_common_species
+        #         print(f"Replaced unknown species with: {self.most_common_species}")
+        #     df['Species_encoded'] = self.label_encoders['Species'].transform(df['Species'])
+
         return df
     
     def create_geographic_features(self, df):
@@ -314,8 +331,8 @@ class WestNileDataPreprocessor:
             'Month_sin', 'Month_cos', 'DayOfYear_sin', 'DayOfYear_cos',
             'IsPeakSeason',
             
-            # Species features - TODO: These will be created by encode_species method
-            #'IsPipiens', 'IsRestuans', 'IsPipiensRestuans', 'IsHighRiskSpecies',
+            # Species features
+            'IsPipiens', 'IsRestuans', 'IsPipiensRestuans', 'IsHighRiskSpecies',
             
             # Base weather features
             'Tmax', 'Tmin', 'Tavg', 'DewPoint', 'WetBulb', 'PrecipTotal',
