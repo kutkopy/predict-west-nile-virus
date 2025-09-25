@@ -1,0 +1,5 @@
+outs:
+- md5: a7f36a065ed26ad1d76a36cb812786fd
+  size: 796163
+  hash: md5
+  path: spray.csv
