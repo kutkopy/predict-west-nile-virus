@@ -21,8 +21,8 @@ stages:
       size: 358139
     - path: src/preprocess.py
       hash: md5
-      md5: 82e0efcd33b6f410db062527b343bfc8
-      size: 19513
+      md5: 758508402d96d61cc6fbf00cc38c1329
+      size: 19463
     outs:
     - path: processed_data/X_test.csv
       hash: md5
@@ -84,13 +84,14 @@ stages:
       md5: a823f7dc83c81b587213613cee9dd9f7
       size: 4359365
   training:
-    cmd: python src/training.py --data-dir processed_data --params-file 
-      params.yaml --metrics-dir metrics --models-dir models
+    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training.py 
+      --data-dir processed_data --params-file params.yaml --metrics-dir metrics 
+      --models-dir models
     deps:
     - path: params.yaml
       hash: md5
-      md5: ad3e583c99886ff119ae7b4a15c80ccc
-      size: 409
+      md5: 2867d54f2ada3e22ec9b0ad7bebf7bd8
+      size: 385
     - path: processed_data/X_test.csv
       hash: md5
       md5: 919dd2734952c106eb350252d3178738
@@ -109,54 +110,50 @@ stages:
       size: 21023
     - path: src/training.py
       hash: md5
-      md5: f8b1de2c466f525d8e1474ae8a73c4b1
-      size: 3463
+      md5: 21e620048ec921f073538fa4000d8c10
+      size: 3462
     params:
       params.yaml:
         train.cv_folds: 3
         train.param_grid:
           smote__sampling_strategy:
+          - 0.1
           - 0.2
           - 0.3
-          - 0.5
           classifier__n_estimators:
-          - 100
-          - 200
-          - 300
+          - 250
           classifier__max_depth:
-          - 10
-          - 15
-          - 20
-          - 
-          classifier__min_samples_split:
-          - 2
           - 5
           - 10
-          classifier__min_samples_leaf:
-          - 1
+          - 15
+          classifier__min_samples_split:
           - 2
+          - 3
+          - 4
+          classifier__min_samples_leaf:
+          - 2
+          - 3
           - 4
           classifier__class_weight:
-          - 
           - balanced
         train.scoring_metric: roc_auc
     outs:
     - path: metrics/training_metrics.json
       hash: md5
-      md5: 3ae6622fc289b7d49c892876b82b5b9a
+      md5: e330f3b20c29c5da3ca64cab0a4c0ebe
       size: 294
     - path: models/best_model.pkl
       hash: md5
-      md5: 01d09cb38616fcca6378bde9a382973a
-      size: 6286404
+      md5: e1d834cbbbab33acef5655fb65e2c71a
+      size: 8255634
   evaluate:
-    cmd: python src/evaluate.py --data-dir processed_data --models-dir models 
-      --metrics-dir metrics
+    cmd: PYTHONWARNINGS="ignore::FutureWarning"  python src/evaluate.py 
+      --data-dir processed_data --models-dir models --metrics-dir metrics
     deps:
     - path: models/best_model.pkl
       hash: md5
-      md5: 01d09cb38616fcca6378bde9a382973a
-      size: 6286404
+      md5: e1d834cbbbab33acef5655fb65e2c71a
+      size: 8255634
     - path: processed_data/X_test.csv
       hash: md5
       md5: 919dd2734952c106eb350252d3178738
@@ -175,14 +172,10 @@ stages:
       size: 21023
     - path: src/evaluate.py
       hash: md5
-      md5: 2243abe8826307434935d94a4e3c6af8
-      size: 5357
+      md5: 3156f04e678fd6a46c01d00718b700e9
+      size: 4791
     outs:
-    - path: feature_importance.png
-      hash: md5
-      md5: 336701dd179900b2567e281bf7a20cd3
-      size: 174414
     - path: metrics/evaluation_metrics.json
       hash: md5
-      md5: 9ace7fc0335c8bb9e64d807a27b9e5a2
-      size: 1154
+      md5: 732498a062958941bae8ae53c2f3ecbc
+      size: 1165

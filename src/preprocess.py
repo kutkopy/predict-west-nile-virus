@@ -11,8 +11,6 @@ import numpy as np
 from datetime import datetime
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
-import warnings
-warnings.filterwarnings('ignore')
 
 
 class WestNileDataPreprocessor:

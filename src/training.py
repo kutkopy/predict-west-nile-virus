@@ -15,7 +15,6 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 import yaml
 
-
 def load_processed_data(data_dir):
     """Load preprocessed data."""
     X_train = pd.read_csv(f'{data_dir}/X_train.csv')

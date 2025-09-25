@@ -14,7 +14,7 @@ stages:
       - processed_data/feature_names.txt
 
   training:
-    cmd: python src/training.py --data-dir processed_data --params-file params.yaml --metrics-dir metrics --models-dir models
+    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training.py --data-dir processed_data --params-file params.yaml --metrics-dir metrics --models-dir models
     deps:
       - src/training.py
       - processed_data/X_train.csv
@@ -32,7 +32,7 @@ stages:
       - metrics/training_metrics.json
 
   evaluate:
-    cmd: python src/evaluate.py --data-dir processed_data --models-dir models --metrics-dir metrics
+    cmd: PYTHONWARNINGS="ignore::FutureWarning"  python src/evaluate.py --data-dir processed_data --models-dir models --metrics-dir metrics
     deps:
       - src/evaluate.py
       - models/best_model.pkl
@@ -40,7 +40,5 @@ stages:
       - processed_data/X_test.csv
       - processed_data/y_train.csv
       - processed_data/feature_names.txt
-    outs:
-      - feature_importance.png
     metrics:
       - metrics/evaluation_metrics.json
