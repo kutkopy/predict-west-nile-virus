@@ -83,24 +83,21 @@ pip install -r requirements.txt
    source venv/bin/activate
    ```
 
-2. Run the optimized predictor:
+2. Run the complete ML pipeline using DVC:
    ```bash
-   python wnv_predictor_optimized.py
+   dvc repro
    ```
 
-This will:
-1. Load and merge all datasets
-2. Preprocess features and handle missing values
-3. Perform grid search optimization with ROC-AUC scoring
-4. Train the final model on full training data
-5. Generate predictions for the test set
-6. Save results to `predictions_optimized.csv`
+This will execute the complete pipeline:
+1. **Preprocess**: Load and merge datasets, engineer features, split data
+2. **Training**: Hyperparameter tuning with cross-validation
+3. **Evaluate**: Model evaluation and performance metrics
 
 ## Output Files
 
-- **predictions_optimized.csv**: Final predictions with probability scores
-- **Feature importance rankings**: Displayed in console output
-- **Performance metrics**: Validation and cross-validation results
+- **models/best_model.pkl**: Trained Random Forest model with optimal hyperparameters
+- **metrics/training_metrics.json**: Cross-validation results and best parameters
+- **metrics/evaluation_metrics.json**: Final model performance metrics
 
 ## Technical Details
 
@@ -122,17 +119,32 @@ This will:
 - ROC-AUC optimization metric
 - Grid search over 32 parameter combinations
 
-## Files Structure
+## Project Structure
 
 ```
-├── data/
+├── data/                          # Raw datasets (managed by DVC)
 │   ├── train.csv
 │   ├── test.csv
 │   ├── weather.csv
 │   └── spray.csv
+├── src/                           # Source code
+│   ├── preprocess.py              # Data preprocessing pipeline
+│   ├── training.py                # Hyperparameter tuning and training
+│   └── evaluate.py                # Model evaluation
+├── processed_data/                # Processed datasets (DVC output)
+│   ├── X_train.csv
+│   ├── X_test.csv
+│   ├── y_train.csv
+│   └── feature_names.txt
+├── models/                        # Trained models (DVC output)
+│   └── best_model.pkl
+├── metrics/                       # Performance metrics (DVC output)
+│   ├── training_metrics.json
+│   └── evaluation_metrics.json
 ├── venv/                          # Virtual environment (created after setup)
-├── wnv_predictor_optimized.py
-├── predictions_optimized.csv
+├── dvc.yaml                       # DVC pipeline definition
+├── dvc.lock                       # DVC pipeline lock file
+├── params.yaml                    # Hyperparameter configuration
 ├── requirements.txt
 ├── setup.sh                       # Setup script for Unix/macOS/Linux
 └── README.md
@@ -142,9 +154,10 @@ This will:
 
 - Python 3.7+
 - pandas >= 2.0.0
-- scikit-learn >= 1.3.0
-- numpy >= 1.24.0
-- imbalanced-learn >= 0.11.0
+- scikit-learn >= 1.7.0
+- numpy >= 1.25.2
+- imbalanced-learn >= 0.14.0
+- dvc[azure] >= 3.63.0
 
 ## Notes
 
