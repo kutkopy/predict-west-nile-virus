@@ -2,4 +2,4 @@ pandas>=2.0.0
 scikit-learn>=1.7.0
 numpy>=1.25.2
 imbalanced-learn>=0.14.0
-dvc[azure]>=3.63.0
+dvc[azure]==3.59.0
