@@ -1,0 +1,6 @@
+[core]
+    remote = azblob
+    autostage = true
+['remote "azblob"']
+    url = azure://predict-west-nile-virus/dvcstore
+    account_name = strgdvcerfachn
