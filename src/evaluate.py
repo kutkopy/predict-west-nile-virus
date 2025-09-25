@@ -7,9 +7,7 @@ import argparse
 import json
 import os
 import pandas as pd
-import numpy as np
 import pickle
-import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 from sklearn.metrics import (classification_report, confusion_matrix,
                            roc_auc_score, roc_curve, precision_recall_curve,
