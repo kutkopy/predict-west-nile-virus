@@ -1,0 +1,46 @@
+stages:
+  preprocess:
+    cmd: python src/preprocess.py --data-dir data --output-dir processed_data
+    deps:
+      - src/preprocess.py
+      - data/train.csv
+      - data/test.csv
+      - data/weather.csv
+      - data/spray.csv
+    outs:
+      - processed_data/X_train.csv
+      - processed_data/X_test.csv
+      - processed_data/y_train.csv
+      - processed_data/feature_names.txt
+
+  training:
+    cmd: python src/training.py --data-dir processed_data --params-file params.yaml --metrics-dir metrics --models-dir models
+    deps:
+      - src/training.py
+      - processed_data/X_train.csv
+      - processed_data/X_test.csv
+      - processed_data/y_train.csv
+      - processed_data/feature_names.txt
+      - params.yaml
+    params:
+      - train.param_grid
+      - train.cv_folds
+      - train.scoring_metric
+    outs:
+      - models/best_model.pkl
+    metrics:
+      - metrics/training_metrics.json
+
+  evaluate:
+    cmd: python src/evaluate.py --data-dir processed_data --models-dir models --metrics-dir metrics
+    deps:
+      - src/evaluate.py
+      - models/best_model.pkl
+      - processed_data/X_train.csv
+      - processed_data/X_test.csv
+      - processed_data/y_train.csv
+      - processed_data/feature_names.txt
+    outs:
+      - feature_importance.png
+    metrics:
+      - metrics/evaluation_metrics.json

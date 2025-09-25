@@ -1,0 +1,13 @@
+train:
+  # Training parameters
+  cv_folds: 3
+  scoring_metric: 'roc_auc'
+
+  # Parameter grid for hyperparameter tuning
+  param_grid:
+    smote__sampling_strategy: [0.2, 0.3, 0.5]
+    classifier__n_estimators: [100, 200, 300]
+    classifier__max_depth: [10, 15, 20, null]
+    classifier__min_samples_split: [2, 5, 10]
+    classifier__min_samples_leaf: [1, 2, 4]
+    classifier__class_weight: [null, 'balanced']

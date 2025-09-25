@@ -1,0 +1,188 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py --data-dir data --output-dir processed_data
+    deps:
+    - path: data/spray.csv
+      hash: md5
+      md5: a7f36a065ed26ad1d76a36cb812786fd
+      size: 796163
+    - path: data/test.csv
+      hash: md5
+      md5: 09015e8c76172760bd67fad41f66e0ff
+      size: 20033097
+    - path: data/train.csv
+      hash: md5
+      md5: 379221538e88798d402be46f71e26069
+      size: 1797335
+    - path: data/weather.csv
+      hash: md5
+      md5: dc872464e4b0b8e3a056a76bf8e7bf5e
+      size: 358139
+    - path: src/preprocess.py
+      hash: md5
+      md5: 82e0efcd33b6f410db062527b343bfc8
+      size: 19513
+    outs:
+    - path: processed_data/X_test.csv
+      hash: md5
+      md5: 919dd2734952c106eb350252d3178738
+      size: 159998898
+    - path: processed_data/X_train.csv
+      hash: md5
+      md5: 9b169d52da9edcd69305d2d82d2675de
+      size: 14483292
+    - path: processed_data/feature_names.txt
+      hash: md5
+      md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
+      size: 851
+    - path: processed_data/y_train.csv
+      hash: md5
+      md5: 331976836b119a8b241817d636fbcc79
+      size: 21023
+  train_baseline:
+    cmd: python src/train_baseline.py --data-dir processed_data --params-file 
+      params.yaml --metrics-dir metrics --models-dir models
+    deps:
+    - path: params.yaml
+      hash: md5
+      md5: 187315c61536bc17ac1806cd0e5e4fc8
+      size: 579
+    - path: processed_data/X_test.csv
+      hash: md5
+      md5: 919dd2734952c106eb350252d3178738
+      size: 159998898
+    - path: processed_data/X_train.csv
+      hash: md5
+      md5: 9b169d52da9edcd69305d2d82d2675de
+      size: 14483292
+    - path: processed_data/feature_names.txt
+      hash: md5
+      md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
+      size: 851
+    - path: processed_data/y_train.csv
+      hash: md5
+      md5: 331976836b119a8b241817d636fbcc79
+      size: 21023
+    - path: src/train_baseline.py
+      hash: md5
+      md5: a5dea5cfc8cc0309aa064b144f3e8390
+      size: 3520
+    params:
+      params.yaml:
+        train.baseline_max_depth: 10
+        train.baseline_min_samples_split: 5
+        train.baseline_n_estimators: 100
+        train.baseline_smote_sampling_strategy: 0.3
+    outs:
+    - path: metrics/baseline_metrics.json
+      hash: md5
+      md5: 99c6810c997fab1f6dac1759252896ac
+      size: 188
+    - path: models/baseline_model.pkl
+      hash: md5
+      md5: a823f7dc83c81b587213613cee9dd9f7
+      size: 4359365
+  training:
+    cmd: python src/training.py --data-dir processed_data --params-file 
+      params.yaml --metrics-dir metrics --models-dir models
+    deps:
+    - path: params.yaml
+      hash: md5
+      md5: ad3e583c99886ff119ae7b4a15c80ccc
+      size: 409
+    - path: processed_data/X_test.csv
+      hash: md5
+      md5: 919dd2734952c106eb350252d3178738
+      size: 159998898
+    - path: processed_data/X_train.csv
+      hash: md5
+      md5: 9b169d52da9edcd69305d2d82d2675de
+      size: 14483292
+    - path: processed_data/feature_names.txt
+      hash: md5
+      md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
+      size: 851
+    - path: processed_data/y_train.csv
+      hash: md5
+      md5: 331976836b119a8b241817d636fbcc79
+      size: 21023
+    - path: src/training.py
+      hash: md5
+      md5: f8b1de2c466f525d8e1474ae8a73c4b1
+      size: 3463
+    params:
+      params.yaml:
+        train.cv_folds: 3
+        train.param_grid:
+          smote__sampling_strategy:
+          - 0.2
+          - 0.3
+          - 0.5
+          classifier__n_estimators:
+          - 100
+          - 200
+          - 300
+          classifier__max_depth:
+          - 10
+          - 15
+          - 20
+          - 
+          classifier__min_samples_split:
+          - 2
+          - 5
+          - 10
+          classifier__min_samples_leaf:
+          - 1
+          - 2
+          - 4
+          classifier__class_weight:
+          - 
+          - balanced
+        train.scoring_metric: roc_auc
+    outs:
+    - path: metrics/training_metrics.json
+      hash: md5
+      md5: 3ae6622fc289b7d49c892876b82b5b9a
+      size: 294
+    - path: models/best_model.pkl
+      hash: md5
+      md5: 01d09cb38616fcca6378bde9a382973a
+      size: 6286404
+  evaluate:
+    cmd: python src/evaluate.py --data-dir processed_data --models-dir models 
+      --metrics-dir metrics
+    deps:
+    - path: models/best_model.pkl
+      hash: md5
+      md5: 01d09cb38616fcca6378bde9a382973a
+      size: 6286404
+    - path: processed_data/X_test.csv
+      hash: md5
+      md5: 919dd2734952c106eb350252d3178738
+      size: 159998898
+    - path: processed_data/X_train.csv
+      hash: md5
+      md5: 9b169d52da9edcd69305d2d82d2675de
+      size: 14483292
+    - path: processed_data/feature_names.txt
+      hash: md5
+      md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
+      size: 851
+    - path: processed_data/y_train.csv
+      hash: md5
+      md5: 331976836b119a8b241817d636fbcc79
+      size: 21023
+    - path: src/evaluate.py
+      hash: md5
+      md5: 2243abe8826307434935d94a4e3c6af8
+      size: 5357
+    outs:
+    - path: feature_importance.png
+      hash: md5
+      md5: 336701dd179900b2567e281bf7a20cd3
+      size: 174414
+    - path: metrics/evaluation_metrics.json
+      hash: md5
+      md5: 9ace7fc0335c8bb9e64d807a27b9e5a2
+      size: 1154
