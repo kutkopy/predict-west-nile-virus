@@ -3,4 +3,4 @@
     autostage = true
 ['remote "azblob"']
     url = azure://predict-west-nile-virus/dvcstore
-    account_name = strgdvcerfachn
+    account_name = bagmlwmlopssbx5292106483

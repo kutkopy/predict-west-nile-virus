@@ -7,39 +7,48 @@ stages:
       hash: md5
       md5: a7f36a065ed26ad1d76a36cb812786fd
       size: 796163
+      isexec: true
     - path: data/test.csv
       hash: md5
       md5: 09015e8c76172760bd67fad41f66e0ff
       size: 20033097
+      isexec: true
     - path: data/train.csv
       hash: md5
       md5: 379221538e88798d402be46f71e26069
       size: 1797335
+      isexec: true
     - path: data/weather.csv
       hash: md5
       md5: dc872464e4b0b8e3a056a76bf8e7bf5e
       size: 358139
+      isexec: true
     - path: src/preprocess.py
       hash: md5
       md5: bd85301434e4b7f2c71c6a030c4487cc
       size: 19449
+      isexec: true
     outs:
     - path: processed_data/X_test.csv
       hash: md5
-      md5: 8e37085ba3f2bc2e92bff457614e1ec7
-      size: 160028056
+      md5: 4b5c7a785e8f8e5ec444a28b0c90b3c3
+      size: 160058788
+      isexec: true
     - path: processed_data/X_train.csv
       hash: md5
-      md5: c7ba3096a851adeab1062e925a81827a
-      size: 14476355
+      md5: ff04ad18c9f17752c25a2089c72540a9
+      size: 14488708
+      isexec: true
     - path: processed_data/feature_names.txt
       hash: md5
       md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
       size: 851
+      isexec: true
     - path: processed_data/y_train.csv
       hash: md5
       md5: 331976836b119a8b241817d636fbcc79
       size: 21023
+      isexec: true
   train_baseline:
     cmd: python src/train_baseline.py --data-dir processed_data --params-file 
       params.yaml --metrics-dir metrics --models-dir models
@@ -92,26 +101,32 @@ stages:
       hash: md5
       md5: 56e42c1ed91228508c85a9d315096262
       size: 446
+      isexec: true
     - path: processed_data/X_test.csv
       hash: md5
-      md5: 8e37085ba3f2bc2e92bff457614e1ec7
-      size: 160028056
+      md5: 4b5c7a785e8f8e5ec444a28b0c90b3c3
+      size: 160058788
+      isexec: true
     - path: processed_data/X_train.csv
       hash: md5
-      md5: c7ba3096a851adeab1062e925a81827a
-      size: 14476355
+      md5: ff04ad18c9f17752c25a2089c72540a9
+      size: 14488708
+      isexec: true
     - path: processed_data/feature_names.txt
       hash: md5
       md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
       size: 851
+      isexec: true
     - path: processed_data/y_train.csv
       hash: md5
       md5: 331976836b119a8b241817d636fbcc79
       size: 21023
+      isexec: true
     - path: src/training.py
       hash: md5
       md5: 21e620048ec921f073538fa4000d8c10
       size: 3462
+      isexec: true
     params:
       params.yaml:
         train.cv_folds: 3
@@ -140,42 +155,51 @@ stages:
     outs:
     - path: metrics/training_metrics.json
       hash: md5
-      md5: e330f3b20c29c5da3ca64cab0a4c0ebe
+      md5: 0f221dc3d4cc690133f1ee4d151063d2
       size: 294
+      isexec: true
     - path: models/best_model.pkl
       hash: md5
-      md5: a4472ef00c042e3c461d0f7c14dbeefa
-      size: 8279803
+      md5: 28b4e28b05c91ec6ffaa0d9e4a3b6f58
+      size: 8280443
+      isexec: true
   evaluate:
     cmd: PYTHONWARNINGS="ignore::FutureWarning"  python src/evaluate.py 
       --data-dir processed_data --models-dir models --metrics-dir metrics
     deps:
     - path: models/best_model.pkl
       hash: md5
-      md5: a4472ef00c042e3c461d0f7c14dbeefa
-      size: 8279803
+      md5: 28b4e28b05c91ec6ffaa0d9e4a3b6f58
+      size: 8280443
+      isexec: true
     - path: processed_data/X_test.csv
       hash: md5
-      md5: 8e37085ba3f2bc2e92bff457614e1ec7
-      size: 160028056
+      md5: 4b5c7a785e8f8e5ec444a28b0c90b3c3
+      size: 160058788
+      isexec: true
     - path: processed_data/X_train.csv
       hash: md5
-      md5: c7ba3096a851adeab1062e925a81827a
-      size: 14476355
+      md5: ff04ad18c9f17752c25a2089c72540a9
+      size: 14488708
+      isexec: true
     - path: processed_data/feature_names.txt
       hash: md5
       md5: 4db0ec2fb1eebe2d7a4b60ed4815a3ab
       size: 851
+      isexec: true
     - path: processed_data/y_train.csv
       hash: md5
       md5: 331976836b119a8b241817d636fbcc79
       size: 21023
+      isexec: true
     - path: src/evaluate.py
       hash: md5
       md5: e6cc8ab61d82cc26dec34c114fdf4ad7
       size: 4740
+      isexec: true
     outs:
     - path: metrics/evaluation_metrics.json
       hash: md5
-      md5: 68df44c806abb9a224ec698152e24304
+      md5: a943bddccb6a172491ef23d4d9821e42
       size: 1164
+      isexec: true
