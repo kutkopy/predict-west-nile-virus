@@ -14,9 +14,9 @@ stages:
       - processed_data/feature_names.txt
 
   training:
-    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training.py --data-dir processed_data --params-file params.yaml --metrics-dir metrics --models-dir models
+    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training_mlflow.py --data-dir processed_data --params-file params.yaml --metrics-dir metrics --models-dir models
     deps:
-      - src/training.py
+      - src/training_mlflow.py
       - processed_data/X_train.csv
       - processed_data/X_test.csv
       - processed_data/y_train.csv

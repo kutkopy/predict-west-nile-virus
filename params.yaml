@@ -9,8 +9,9 @@ train:
     - 0.1
     - 0.2
     - 0.3
+    - 0.4
     classifier__n_estimators:
-    - 250
+    - 50
     classifier__max_depth:
     - 5
     - 10

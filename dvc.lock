@@ -93,14 +93,14 @@ stages:
       md5: a823f7dc83c81b587213613cee9dd9f7
       size: 4359365
   training:
-    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training.py 
+    cmd: PYTHONWARNINGS="ignore::FutureWarning" python src/training_mlflow.py 
       --data-dir processed_data --params-file params.yaml --metrics-dir metrics 
       --models-dir models
     deps:
     - path: params.yaml
       hash: md5
-      md5: 56e42c1ed91228508c85a9d315096262
-      size: 446
+      md5: 1422d47afb7a55d2583d00abbb9e5cf5
+      size: 455
       isexec: true
     - path: processed_data/X_test.csv
       hash: md5
@@ -122,10 +122,10 @@ stages:
       md5: 331976836b119a8b241817d636fbcc79
       size: 21023
       isexec: true
-    - path: src/training.py
+    - path: src/training_mlflow.py
       hash: md5
-      md5: 21e620048ec921f073538fa4000d8c10
-      size: 3462
+      md5: 5e4c71467422d1ef35a3d3ae67ca0a81
+      size: 19233
       isexec: true
     params:
       params.yaml:
@@ -135,8 +135,9 @@ stages:
           - 0.1
           - 0.2
           - 0.3
+          - 0.4
           classifier__n_estimators:
-          - 250
+          - 50
           classifier__max_depth:
           - 5
           - 10
@@ -155,13 +156,13 @@ stages:
     outs:
     - path: metrics/training_metrics.json
       hash: md5
-      md5: 0f221dc3d4cc690133f1ee4d151063d2
-      size: 294
+      md5: 029491cc7a64c92599da0d24d8636c3e
+      size: 1030
       isexec: true
     - path: models/best_model.pkl
       hash: md5
-      md5: 28b4e28b05c91ec6ffaa0d9e4a3b6f58
-      size: 8280443
+      md5: a007d1e7008decbd54eb8f7aa8a04c09
+      size: 1892040
       isexec: true
   evaluate:
     cmd: PYTHONWARNINGS="ignore::FutureWarning"  python src/evaluate.py 
@@ -169,8 +170,8 @@ stages:
     deps:
     - path: models/best_model.pkl
       hash: md5
-      md5: 28b4e28b05c91ec6ffaa0d9e4a3b6f58
-      size: 8280443
+      md5: a007d1e7008decbd54eb8f7aa8a04c09
+      size: 1892040
       isexec: true
     - path: processed_data/X_test.csv
       hash: md5
@@ -200,6 +201,6 @@ stages:
     outs:
     - path: metrics/evaluation_metrics.json
       hash: md5
-      md5: a943bddccb6a172491ef23d4d9821e42
-      size: 1164
+      md5: 866893b16d7e373880b62d06790131b1
+      size: 1155
       isexec: true
