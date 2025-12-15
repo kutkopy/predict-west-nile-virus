@@ -151,24 +151,6 @@ def log_grid_search_results(grid_search, params):
     mlflow.log_metric("cv_score_std", cv_results_df['mean_test_score'].std())
     mlflow.log_metric("cv_score_min", cv_results_df['mean_test_score'].min())
     mlflow.log_metric("cv_score_max", cv_results_df['mean_test_score'].max())
-    
-    # Print top 5 parameter combinations
-    print("\n" + "="*100)
-    print("TOP 5 PARAMETER COMBINATIONS")
-    print("="*100)
-    
-    top_5 = cv_results_df.head(5)
-    for idx, row in top_5.iterrows():
-        rank = int(row['rank_test_score'])
-        score = row['mean_test_score']
-        std = row['std_test_score']
-        params_dict = row['params']
-        
-        print(f"\nRank {rank}: Score = {score:.4f} (+/- {std:.4f})")
-        for param, value in params_dict.items():
-            print(f"  {param}: {value}")
-    
-    print("\n" + "="*100)
 
 
 def evaluate_train_set(model, X_train, y_train):
@@ -206,83 +188,6 @@ def evaluate_train_set(model, X_train, y_train):
         'train_metrics': train_report
     }
 
-
-def generate_test_predictions(model, X_test, output_dir):
-    """Generate predictions for test set and save them."""
-    print("\nGenerating predictions for test set...")
-    
-    # Generate predictions
-    y_test_pred = model.predict(X_test)
-    y_test_proba = model.predict_proba(X_test)[:, 1]
-    
-    # Create predictions dataframe
-    predictions_df = pd.DataFrame({
-        'prediction': y_test_pred,
-        'probability': y_test_proba
-    })
-    
-    # Save predictions
-    os.makedirs(output_dir, exist_ok=True)
-    predictions_path = f'{output_dir}/test_predictions.csv'
-    predictions_df.to_csv(predictions_path, index=False)
-    
-    # Log as artifact
-    try:
-        mlflow.log_artifact(predictions_path, artifact_path="predictions")
-        print(f"Test predictions logged to MLflow")
-    except Exception as e:
-        print(f"Warning: Could not log predictions artifact: {e}")
-    
-    # Log prediction statistics
-    mlflow.log_metric("test_predicted_positive_rate", float(y_test_pred.mean()))
-    mlflow.log_metric("test_mean_probability", float(y_test_proba.mean()))
-    mlflow.log_metric("test_std_probability", float(y_test_proba.std()))
-    
-    print(f"Test predictions saved to {predictions_path}")
-    print(f"Predicted positive rate: {y_test_pred.mean():.4f}")
-    print(f"Mean probability: {y_test_proba.mean():.4f}")
-    
-    return predictions_df
-
-
-def log_feature_importance(model, feature_names, top_n=20):
-    """Log feature importance to MLflow."""
-    # Get feature importance from the classifier step
-    classifier = model.named_steps['classifier']
-    importance = classifier.feature_importances_
-    
-    # Create feature importance dataframe
-    feature_importance_df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': importance
-    }).sort_values('importance', ascending=False)
-    
-    # Log top features as metrics
-    for idx, row in feature_importance_df.head(top_n).iterrows():
-        feature_name_safe = row['feature'].replace('/', '_').replace(':', '_').replace(' ', '_')
-        mlflow.log_metric(f"importance_{feature_name_safe}", row['importance'])
-    
-    # Save and log full feature importance
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    importance_path = f"feature_importance_{timestamp}.csv"
-    
-    try:
-        feature_importance_df.to_csv(importance_path, index=False)
-        mlflow.log_artifact(importance_path, artifact_path="feature_importance")
-        print(f"Feature importance logged to MLflow")
-    except Exception as e:
-        print(f"Warning: Could not log feature importance artifact: {e}")
-    finally:
-        if os.path.exists(importance_path):
-            os.remove(importance_path)
-    
-    print(f"\nTop {top_n} most important features:")
-    for idx, row in feature_importance_df.head(top_n).iterrows():
-        print(f"  {row['feature']}: {row['importance']:.4f}")
-    
-    return feature_importance_df
-
-
 def save_training_metrics(best_score, best_params, train_results, output_dir):
     """Save training metrics."""
     os.makedirs(output_dir, exist_ok=True)
@@ -308,14 +213,13 @@ def save_training_metrics(best_score, best_params, train_results, output_dir):
         print(f"Warning: Could not log metrics artifact: {e}")
 
 
-def log_model_to_mlflow(model, X_train, model_path, register_model=False, model_name=None, run_id=None):
+def log_model_to_mlflow(model, X_train, register_model=False, model_name=None, run_id=None):
     """
     Log model to MLflow with Azure ML compatibility.
     
     Args:
         model: Trained model to log
         X_train: Training data for signature inference
-        model_path: Path to the saved pickle model
         register_model: Whether to register in model registry
         model_name: Name for model registry
         run_id: Current MLflow run ID
@@ -333,7 +237,7 @@ def log_model_to_mlflow(model, X_train, model_path, register_model=False, model_
         print(f"Warning: Could not infer signature: {e}")
         signature = None
     
-    # Attempt 1: Use mlflow.sklearn.log_model (preferred)
+    # Use mlflow.sklearn.log_model to log model
     try:
         mlflow.sklearn.log_model(
             sk_model=model,
@@ -345,14 +249,6 @@ def log_model_to_mlflow(model, X_train, model_path, register_model=False, model_
         model_logged = True
     except Exception as e:
         print(f"Warning: mlflow.sklearn.log_model failed: {e}")
-        
-        # Attempt 2: Log pickle file as artifact
-        try:
-            mlflow.log_artifact(model_path, artifact_path="model")
-            print("Model logged as pickle artifact")
-            model_logged = True
-        except Exception as e2:
-            print(f"Warning: Could not log model artifact: {e2}")
     
     # Register model if requested and model was logged
     if register_model and model_name and run_id and model_logged:
@@ -410,7 +306,8 @@ def main():
     X_train, X_test, y_train, feature_names = load_processed_data(args.data_dir)
     
     # Generate run name if not provided
-    run_name = args.run_name or f"wnv_training_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    PERSONAL_SHORTNAME = "msa"
+    run_name = args.run_name or f"wnv_training_{PERSONAL_SHORTNAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
     # Start MLflow run
     with mlflow.start_run(run_name=run_name) as run:
@@ -444,34 +341,18 @@ def main():
             # Evaluate model on training set
             train_results = evaluate_train_set(best_model, X_train, y_train)
             
-            # Log feature importance
-            feature_importance_df = log_feature_importance(best_model, feature_names, top_n=20)
-            
-            # Generate test predictions
-            predictions_df = generate_test_predictions(best_model, X_test, args.metrics_dir)
-            
             # Save metrics
             save_training_metrics(best_score, best_params, train_results, args.metrics_dir)
-            
-            # Save best model with pickle
+
+            # Save best model
             os.makedirs(args.models_dir, exist_ok=True)
-            model_path = f'{args.models_dir}/best_model.pkl'
-            with open(model_path, 'wb') as f:
+            with open(f'{args.models_dir}/best_model.pkl', 'wb') as f:
                 pickle.dump(best_model, f)
-            print(f"Model saved to {model_path}")
             
-            # Log the pickle model as artifact (always do this as backup)
-            try:
-                mlflow.log_artifact(model_path, artifact_path="pickle-model")
-                print(f"Pickle model logged to MLflow")
-            except Exception as e:
-                print(f"Warning: Could not log pickle model: {e}")
-            
-            # Log model to MLflow with Azure ML compatibility
+            # Log best model
             log_model_to_mlflow(
                 model=best_model,
                 X_train=X_train,
-                model_path=model_path,
                 register_model=args.register_model,
                 model_name=args.model_name,
                 run_id=run.info.run_id
